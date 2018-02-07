@@ -59,6 +59,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	uint8_t data[UNIO_EEPROM_PAGE_SIZE];
 	uint8_t count;
 
+	if (!unio_is_eeprom_present())
+	{
+		//EEPROM NOT PRESENT
+		Nop();
+	}
+
 	for (count = 0; count < UNIO_EEPROM_PAGE_SIZE; count++)
 		data[count] = 0x40 + count;
 	if (unio_eeprom_write(0x0000, &data[0], UNIO_EEPROM_PAGE_SIZE))
@@ -149,6 +155,7 @@ void unio_wait_for_write_complete (void);
 //----- INTERNAL & EXTERNAL FUNCTIONS -----
 //-----------------------------------------
 //(Also defined below as extern)
+BYTE unio_is_eeprom_present (void);
 BYTE unio_eeprom_write (uint16_t address, uint8_t *data, uint8_t length);
 BYTE unio_eeprom_read (uint16_t address, uint8_t *data, uint8_t length);
 void unio_standby_pulse (void);
@@ -157,6 +164,7 @@ void unio_standby_pulse (void);
 //------------------------------
 //----- EXTERNAL FUNCTIONS -----
 //------------------------------
+extern BYTE unio_is_eeprom_present (void);
 extern BYTE unio_eeprom_write (uint16_t address, uint8_t *data, uint8_t length);
 extern BYTE unio_eeprom_read (uint16_t address, uint8_t *data, uint8_t length);
 void unio_standby_pulse (void);

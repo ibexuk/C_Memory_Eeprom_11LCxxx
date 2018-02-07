@@ -104,6 +104,46 @@ void unio_eeprom_init (void)
 
 
 
+//***************************************
+//***************************************
+//********** IS EEPROM PRESENT **********
+//***************************************
+//***************************************
+//Carries out a quick read of status register to see if device is present
+//Returns:
+//	1 if present, 0 if not present
+BYTE unio_is_eeprom_present (void)
+{
+	unio_delay_5us(2);						//Observe Tss time (min 10uS, no max)
+
+	//----- HEADER -----
+	unio_send_mak = 1;
+	unio_start_header();					//Output Start Header
+
+	//----- DEVICE ADDRESS -----
+	unio_data_out = UNIO_EEPROM_ADDRESS;
+	unio_output_byte();
+	if (!unio_input_bit_read)				//Got SAK?
+	{
+		unio_idle();
+		return(0);
+	}
+
+	//----- WE GOT AN ACK - DEVICE PRESENT -----
+	//COMPLETE THE READ SEQUENCE TO END THE BUS ACCESS
+
+	unio_data_out = 0b00000101;				//RDSR command
+	unio_output_byte();
+
+	unio_input_byte();						//Input byte
+	unio_send_mak = 0;
+	unio_ack_sequence();
+
+	unio_idle();
+	return(1);
+}
+
+
 //*********************************
 //*********************************
 //********** EEPROM READ **********
